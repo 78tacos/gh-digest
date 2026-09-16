@@ -1,0 +1,6 @@
+/gh-digest
+/bin/
+*.exe
+*.test
+coverage.out
+/tmp/
