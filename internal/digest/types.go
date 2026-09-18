@@ -82,13 +82,6 @@ type Options struct {
 	IncludePRs           bool
 }
 
-func (n Notification) Key() string {
-	if n.Repo == "" || n.Number == 0 {
-		return n.ID
-	}
-	return n.Repo + "#" + strconv.Itoa(n.Number)
-}
-
 func (p PullRequest) Key() string {
 	return p.Repo + "#" + strconv.Itoa(p.Number)
 }

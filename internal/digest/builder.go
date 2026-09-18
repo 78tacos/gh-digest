@@ -7,7 +7,6 @@ import (
 )
 
 // Builder reduces a GitHub Snapshot into a Digest.
-// Methods are used instead of package-level helpers so digest rules stay in one type.
 type Builder struct {
 	Opts Options
 }
@@ -17,13 +16,6 @@ func (b Builder) now() time.Time {
 		return time.Now().UTC()
 	}
 	return b.Opts.Now.UTC()
-}
-
-func (b Builder) notificationLimit() int {
-	if b.Opts.NotificationLimit <= 0 {
-		return 50
-	}
-	return b.Opts.NotificationLimit
 }
 
 // Build groups notifications by repo, caps the list, and classifies open PRs
@@ -66,7 +58,7 @@ func (b Builder) buildNotifications(items []Notification) NotificationSection {
 	})
 
 	total := len(filtered)
-	limit := b.notificationLimit()
+	limit := b.Opts.NotificationLimit
 	if len(filtered) > limit {
 		filtered = filtered[:limit]
 	}
