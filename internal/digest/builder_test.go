@@ -130,6 +130,7 @@ func TestBuilderIncludesReadWhenRequested(t *testing.T) {
 	now := time.Date(2026, 9, 16, 16, 0, 0, 0, time.UTC)
 	b := Builder{Opts: Options{
 		Now:                  now,
+		NotificationLimit:    50,
 		IncludeRead:          true,
 		IncludeNotifications: true,
 	}}
@@ -170,11 +171,29 @@ func TestBuilderAppliesLimitAndSince(t *testing.T) {
 	}
 }
 
+func TestBuilderLimitZeroShowsNone(t *testing.T) {
+	now := time.Date(2026, 9, 16, 16, 0, 0, 0, time.UTC)
+	b := Builder{Opts: Options{
+		Now:                  now,
+		NotificationLimit:    0,
+		IncludeNotifications: true,
+	}}
+	d := b.Build(testSnapshot(now))
+	n := d.Notifications
+	if n.Total != 4 {
+		t.Fatalf("total = %d, want 4 unread", n.Total)
+	}
+	if n.Shown != 0 || len(n.Repos) != 0 {
+		t.Fatalf("shown=%d repos=%d, want 0/0", n.Shown, len(n.Repos))
+	}
+}
+
 func TestBuilderClassifiesPRsExclusively(t *testing.T) {
 	now := time.Date(2026, 9, 16, 16, 0, 0, 0, time.UTC)
 	b := Builder{Opts: Options{
-		Now:        now,
-		IncludePRs: true,
+		Now:               now,
+		NotificationLimit: 50,
+		IncludePRs:        true,
 	}}
 	d := b.Build(testSnapshot(now))
 	prs := d.PullRequests
@@ -195,6 +214,7 @@ func TestBuilderClassifiesPRsExclusively(t *testing.T) {
 func TestBuilderEmptySnapshot(t *testing.T) {
 	b := Builder{Opts: Options{
 		Now:                  time.Date(2026, 9, 16, 16, 0, 0, 0, time.UTC),
+		NotificationLimit:    50,
 		IncludeNotifications: true,
 		IncludePRs:           true,
 	}}

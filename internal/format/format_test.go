@@ -13,6 +13,7 @@ import (
 func sampleDigest(now time.Time) digest.Digest {
 	b := digest.Builder{Opts: digest.Options{
 		Now:                  now,
+		NotificationLimit:    50,
 		IncludeRead:          false,
 		IncludeNotifications: true,
 		IncludePRs:           true,
@@ -68,6 +69,7 @@ func TestTextEmptyStates(t *testing.T) {
 	now := time.Date(2026, 9, 16, 16, 0, 0, 0, time.UTC)
 	d := digest.Builder{Opts: digest.Options{
 		Now:                  now,
+		NotificationLimit:    50,
 		IncludeNotifications: true,
 		IncludePRs:           true,
 	}}.Build(digest.Snapshot{User: digest.User{Login: "octocat"}})
