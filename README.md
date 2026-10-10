@@ -1,13 +1,11 @@
 # gh-digest
 
-A small command-line tool that digests **GitHub notifications** and **open pull requests** for the authenticated user.
-
-v1 is a terminal summary, not a dashboard. It reads GitHub through the [`gh`](https://cli.github.com) CLI so you reuse the same login you already use for `gh pr` and `gh api`.
+`gh-digest` prints your GitHub notifications and open pull requests. It calls the [`gh`](https://cli.github.com) CLI, so it uses the same login as `gh pr` and `gh api`.
 
 ## Prerequisites
 
-1. [Go 1.22+](https://go.dev/dl/) to build from source.
-2. [GitHub CLI](https://cli.github.com) (`gh`) installed and authenticated:
+- [Go 1.22+](https://go.dev/dl/) to build from source
+- [GitHub CLI](https://cli.github.com) (`gh`), installed and authenticated:
 
 ```bash
 gh auth login
@@ -20,17 +18,15 @@ gh auth status
 - `GET /notifications`
 - `GET /search/issues` for open PRs you authored, were asked to review, or are assigned
 
-If notification fetches fail with 403/401, refresh the `notifications` scope:
+If a notification fetch returns 401 or 403, refresh the `notifications` scope:
 
 ```bash
 gh auth refresh -s notifications
 ```
 
-`gh-digest` needs a **user** login. GitHub App installation tokens and `GITHUB_TOKEN` in Actions typically cannot call `/user` or list your notifications.
+You need a user login. GitHub App installation tokens and `GITHUB_TOKEN` in Actions usually cannot call `/user` or list your notifications.
 
 ## Install
-
-From this repository:
 
 ```bash
 git clone https://github.com/78tacos/gh-digest.git
@@ -38,9 +34,9 @@ cd gh-digest
 go install ./cmd/gh-digest
 ```
 
-`go install` puts the binary in `$(go env GOPATH)/bin` (add that directory to `PATH`).
+`go install` puts the binary in `$(go env GOPATH)/bin`. Add that directory to `PATH` if it is not there already.
 
-To build a local binary instead:
+To build a binary in this directory:
 
 ```bash
 go build -o gh-digest ./cmd/gh-digest
@@ -94,7 +90,7 @@ Assigned (1)
   acme/web#15  Fix nav  1d  no comments
 ```
 
-Unread notifications are marked with `*`. Open PRs are split into exclusive buckets: **authored** wins, then **review requested**, then **assigned**.
+Unread notifications are marked with `*`. An open pull request is listed once: authored, then review requested, then assigned.
 
 ## Tests
 
@@ -103,7 +99,7 @@ go test ./...
 go vet ./...
 ```
 
-Core digest rules (grouping, unread filtering, limits, exclusive PR classification) live in `internal/digest` and are covered without calling GitHub.
+Grouping, unread filtering, limits, and pull-request classification are covered in `internal/digest` without calling GitHub.
 
 ## License
 
