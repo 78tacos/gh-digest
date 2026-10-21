@@ -116,6 +116,28 @@ func TestRunNotifsOnlyAndAll(t *testing.T) {
 	}
 }
 
+func TestRunLimitZeroShowsNoNotifications(t *testing.T) {
+	now := time.Date(2026, 9, 16, 16, 0, 0, 0, time.UTC)
+	src := &stubSource{snap: digest.Snapshot{
+		User: digest.User{Login: "octocat"},
+		Notifications: []digest.Notification{{
+			ID: "1", Unread: true, Reason: "mention", Title: "Hello",
+			Type: "Issue", Repo: "acme/api", Number: 1, UpdatedAt: now.Add(-time.Hour),
+		}},
+	}}
+	a := &App{Source: src, Now: now}
+	var out bytes.Buffer
+	if code := a.Run([]string{"--limit", "0", "--notifs-only"}, &out, &out); code != 0 {
+		t.Fatalf("exit %d: %s", code, out.String())
+	}
+	if strings.Contains(out.String(), "acme/api") {
+		t.Fatalf("limit 0 still showed a notification: %s", out.String())
+	}
+	if !strings.Contains(out.String(), "0 shown") {
+		t.Fatalf("expected 0 shown, got %s", out.String())
+	}
+}
+
 func TestRunSourceError(t *testing.T) {
 	src := &stubSource{err: errors.New("boom")}
 	var errBuf bytes.Buffer
